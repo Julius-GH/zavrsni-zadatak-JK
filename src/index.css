@@ -1,2 +1,12 @@
 @import "tailwindcss";
 @plugin "daisyui";
+
+@layer base {
+  :root {
+    --color-primary: #ff4d6d;
+    --color-secondary: #ff8fab;
+    --color-accent: #ffb3c6;
+    --color-base-100: #fff0f5;
+    --color-base-content: #3a0d1f;
+  }
+}

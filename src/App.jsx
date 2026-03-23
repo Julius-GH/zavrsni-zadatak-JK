@@ -1,3 +1,5 @@
+document.documentElement.setAttribute("data-theme", "love");
+
 import { Router, Route, Navigate } from "@solidjs/router";
 import { isAuthenticated, authLoading } from "./services/auth.js";
 import { Show } from "solid-js";
@@ -10,6 +12,7 @@ import SignUp from "./pages/SignUp";
 import Error from "./pages/Error";
 import SignOut from "./pages/SignOut";
 import ResetPassword from "./pages/ResetPassword";
+import UserProfile from "./pages/UserProfile.jsx";
 
 export default function App() {
   return (
@@ -20,6 +23,9 @@ export default function App() {
         <Route path="signup" component={SignUp} />
         <Route path="signout" component={SignOut} />
         <Route path="resetpassword" component={ResetPassword} />
+        <Route path="/profile" component={AuthBoundary}>
+          <Route path="/" component={UserProfile} />
+        </Route>
       </Route>
       <Route path="/error" component={Error} />
       <Route path="*" component={NotFound} />
@@ -39,8 +45,8 @@ function Layout(props) {
             <ul
               tabindex="-1"
               class="menu menu-sm dropdown-content bg-base-100 rounded-box z-1 mt-3 w-52 p-2 shadow">
-              <li><a href="/event/management">Upravljanje događajima</a></li>
-              <li><a href="/event/private">Privatni događaji</a></li>
+              <li><a href="/">jos nista</a></li>
+              <li><a href="/">jos nista</a></li>
             </ul>
           </div>
         </div>
