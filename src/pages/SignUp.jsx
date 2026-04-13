@@ -1,5 +1,6 @@
 import { createSignal, Show } from "solid-js";
 import { authService } from "../services/auth.js";
+import { userService } from "../services/db";
 import Message from "../components/Message.jsx";
 import { SignUpSchema } from "../lib/schemas.js";
 import { addToast } from "../components/Toast.jsx";
@@ -16,13 +17,12 @@ export default function SignUp() {
         const email = data.get("email");
         const password = data.get("password");
         const passwordConfirm = data.get("passwordConfirm");
-        const formData = {
-            name, email, password, passwordConfirm
-        };
+        const formData = { name, email, password, passwordConfirm };
 
         try {
             const validated = SignUpSchema.parse(formData);
-            await authService.signUp(validated.email, validated.password, validated.name);
+            const user = await authService.signUp(validated.email, validated.password, validated.name);
+            await userService.createUser(user.uid, { name: validated.name, email: validated.email });
             setSuccess(true);
         } catch (error) {
             if (error.name === "ZodError") {
@@ -54,7 +54,6 @@ export default function SignUp() {
                         </Show>
                     </div>
 
-
                     <div>
                         <label class="floating-label mb-1 w-full">
                             <input class="input input-md w-full" type="email" name="email" placeholder="E-mail adresa" required="true" />
@@ -84,7 +83,6 @@ export default function SignUp() {
                             <p class="text-error text-xs mb-2">{validation().passwordConfirm}</p>
                         </Show>
                     </div>
-
 
                     <button type="submit" class="btn btn-primary">Potvrdi</button>
                 </form>
