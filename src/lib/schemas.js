@@ -1,7 +1,5 @@
 import { z } from "zod";
 
-// ─── existing auth schemas ────────────────────────────────────────────────────
-
 export const SignUpSchema = z.object({
   name: z.string().min(2, "Ime mora imati najmanje 2 znaka"),
   email: z.email("E-mail adresa mora biti u ispravnom obliku"),
@@ -17,8 +15,6 @@ export const SignInSchema = z.object({
   password: z.string().min(6, "Zaporka mora imati najmanje 6 znakova"),
 });
 
-// ─── partner connect ──────────────────────────────────────────────────────────
-
 export const ConnectCodeSchema = z.object({
   code: z
     .string()
@@ -27,8 +23,6 @@ export const ConnectCodeSchema = z.object({
     .regex(/^[A-Z0-9]+$/i, "Kod smije sadržavati samo slova i brojeve"),
 });
 
-// ─── daily question answer ────────────────────────────────────────────────────
-
 export const AnswerSchema = z.object({
   answer: z
     .string()
@@ -36,16 +30,12 @@ export const AnswerSchema = z.object({
     .max(500, "Odgovor ne smije biti duži od 500 znakova"),
 });
 
-// ─── chat message ─────────────────────────────────────────────────────────────
-
 export const MessageSchema = z.object({
   text: z
     .string()
     .min(1, "Poruka ne smije biti prazna")
     .max(1000, "Poruka ne smije biti duža od 1000 znakova"),
 });
-
-// ─── journal entry ───────────────────────────────────────────────────────────
 
 export const JournalEntrySchema = z.object({
   title: z

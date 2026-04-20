@@ -22,11 +22,9 @@ export default function Home() {
     const u = currentUser();
     if (!u) return;
 
-    // subscribe to own user doc
     unsubUser = userService.subscribeUser(u.uid, async (data) => {
       setUserDoc(data);
 
-      // once we have coupleId + partnerUid, subscribe to the rest
       if (data?.coupleId && data?.partnerUid) {
         if (!unsubPartner) {
           unsubPartner = userService.subscribeUser(data.partnerUid, (pd) => {
@@ -95,7 +93,6 @@ export default function Home() {
 
       <Show when={!loading() && userDoc()?.coupleId}>
 
-        {/* Greeting */}
         <div class="flex items-center justify-between">
           <div>
             <h1 class="text-2xl font-bold">
@@ -107,7 +104,7 @@ export default function Home() {
               })}
             </p>
           </div>
-          {/* Streak badge */}
+
           <Show when={coupleDoc()?.streak > 0}>
             <div class="flex flex-col items-center bg-primary/10 rounded-2xl px-4 py-2">
               <span class="text-2xl">🔥</span>
@@ -121,7 +118,6 @@ export default function Home() {
           </Show>
         </div>
 
-        {/* Mood row */}
         <div class="card bg-base-100 shadow-sm">
           <div class="card-body p-4 gap-4">
             <div class="flex items-center justify-between">
@@ -159,7 +155,6 @@ export default function Home() {
           </div>
         </div>
 
-        {/* Daily question */}
         <div class="card bg-base-100 shadow-sm">
           <div class="card-body p-4 gap-3">
             <div class="flex items-center justify-between">
@@ -170,7 +165,6 @@ export default function Home() {
             </div>
             <p class="text-base-content/80 italic">"{question}"</p>
 
-            {/* Answers preview */}
             <Show when={myAnswer() || partnerAnswer()}>
               <div class="flex flex-col gap-2 mt-1">
                 <Show when={myAnswer()}>
@@ -198,7 +192,6 @@ export default function Home() {
           </div>
         </div>
 
-        {/* Quick actions */}
         <div class="grid grid-cols-2 gap-3">
           <a href="/chat" class="card bg-base-100 shadow-sm hover:shadow-md transition-shadow cursor-pointer">
             <div class="card-body p-4 items-center text-center gap-2">

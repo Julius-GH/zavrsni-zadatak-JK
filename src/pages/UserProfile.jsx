@@ -41,7 +41,6 @@ export default function UserProfile() {
 
             <Show when={!loading() && user()}>
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
-                    {/* Podaci o korisniku */}
                     <div class="card bg-base-200">
                         <div class="card-body">
                             <h2 class="card-title text-lg">👤 Profil</h2>

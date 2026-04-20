@@ -17,10 +17,8 @@ import {
 } from "firebase/firestore";
 import { db } from "../lib/firebase";
 
-// ─── helpers ────────────────────────────────────────────────────────────────
-
 function generateCode(length = 6) {
-  const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789"; // no ambiguous chars
+  const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
   let code = "";
   for (let i = 0; i < length; i++) {
     code += chars[Math.floor(Math.random() * chars.length)];
@@ -28,13 +26,8 @@ function generateCode(length = 6) {
   return code;
 }
 
-// ─── users ───────────────────────────────────────────────────────────────────
-
 export const userService = {
-  /**
-   * Create or overwrite user document after registration.
-   * Called once in SignUp after authService.signUp().
-   */
+ 
   async createUser(uid, { name, email }) {
     const code = generateCode();
     await setDoc(doc(db, "users", uid), {
@@ -51,18 +44,15 @@ export const userService = {
     return code;
   },
 
-  /** Fetch a single user document. */
   async getUser(uid) {
     const snap = await getDoc(doc(db, "users", uid));
     return snap.exists() ? snap.data() : null;
   },
 
-  /** Update arbitrary fields on a user doc. */
   async updateUser(uid, data) {
     await updateDoc(doc(db, "users", uid), data);
   },
 
-  /** Subscribe to live changes on current user doc. Returns unsubscribe fn. */
   subscribeUser(uid, callback) {
     return onSnapshot(doc(db, "users", uid), (snap) => {
       callback(snap.exists() ? snap.data() : null);
@@ -70,15 +60,8 @@ export const userService = {
   },
 };
 
-// ─── couple / pairing ────────────────────────────────────────────────────────
-
 export const coupleService = {
-  /**
-   * Look up user by their connectCode, then link both users into a new
-   * couples document. Returns the new coupleId.
-   */
   async connectWithCode(currentUid, code) {
-    // find partner by code
     const q = query(
       collection(db, "users"),
       where("connectCode", "==", code.toUpperCase()),
@@ -101,7 +84,6 @@ export const coupleService = {
     if (currentData?.coupleId)
       throw new Error("Već si spojen s partnerom.");
 
-    // create couple doc
     const coupleRef = await addDoc(collection(db, "couples"), {
       members: [currentUid, partnerUid],
       createdAt: serverTimestamp(),
@@ -110,7 +92,6 @@ export const coupleService = {
     });
     const coupleId = coupleRef.id;
 
-    // link both users
     await Promise.all([
       updateDoc(doc(db, "users", currentUid), {
         coupleId,
@@ -125,27 +106,24 @@ export const coupleService = {
     return coupleId;
   },
 
-  /** Get couple document. */
   async getCouple(coupleId) {
     const snap = await getDoc(doc(db, "couples", coupleId));
     return snap.exists() ? snap.data() : null;
   },
 
-  /** Subscribe to couple doc. Returns unsubscribe fn. */
   subscribeCouple(coupleId, callback) {
     return onSnapshot(doc(db, "couples", coupleId), (snap) => {
       callback(snap.exists() ? snap.data() : null);
     });
   },
 
-  /** Update streak after any activity. */
   async updateStreak(coupleId) {
     const today = new Date().toISOString().split("T")[0];
     const couple = await this.getCouple(coupleId);
     if (!couple) return;
 
     const last = couple.lastActivityDate;
-    if (last === today) return; // already updated today
+    if (last === today) return;
 
     const yesterday = new Date(Date.now() - 86400000).toISOString().split("T")[0];
     const newStreak = last === yesterday ? (couple.streak || 0) + 1 : 1;
@@ -157,45 +135,40 @@ export const coupleService = {
   },
 };
 
-// ─── daily questions ─────────────────────────────────────────────────────────
-
-// Seed questions — stored locally, no Firestore collection needed for MVP.
-// Index is derived from days since epoch so both partners see the same question.
 const QUESTIONS = [
-  "Koje je tvoje najdraže zajedničko sjećanje s mnom?",
+  "Koje je tvoje najdraže zajedničko sjećanje sa mnom?",
   "Što te danas usrećilo?",
   "Koje mjesto na svijetu bismo trebali posjetiti zajedno?",
-  "Što je nešto što bi volio/voljela da znam o tebi?",
+  "Što je nešto što bi volio/voljela znati o tebi?",
   "Koji film ili serija te je zadnji put stvarno dirnula?",
   "Kada si se zadnji put osjećao/osjećala ponosan/ponosna na sebe?",
-  "Što misliš da je naša najveća snaga kao para?",
+  "Što misliš da je naša najveća snaga kao par?",
   "Koji je tvoj idealni vikend?",
   "Postoji li nešto što si oduvijek želio/željela naučiti?",
-  "Što te čini da se osjećaš voljenim/voljenom?",
-  "Kada si zadnji put izašao/izašla iz zone komfora?",
+  "Što te čini voljenim/voljenom?",
+  "Kada si zadnji put izašao/izašla iz komfort zone?",
   "Koji je tvoj omiljeni dio dana?",
   "Što bi napravio/napravila s neočekivanih slobodnih 24 sata?",
-  "Koja je tvoja najdraža godišnja doba i zašto?",
+  "Koje je tvoje najdraže godišnje doba i zašto?",
   "Što te najviše nervira, a što te umiruje?",
   "Koji san ili cilj ti je najvažniji trenutno?",
   "Kada si se zadnji put od srca nasmijao/nasmijala?",
   "Što bi promijenio/promijenila u svom danu?",
   "Kako zamišljaš naš život za 5 godina?",
-  "Što te čini da se osjećaš sigurno u našoj vezi?",
-  "Koji je tvoj omiljeni obrok koji pravim/pravim?",
+  "Što te potiče da se osjećaš sigurno u našoj vezi?",
+  "Koji je tvoj omiljeni obrok koji napravim?",
   "Što ti znači dom?",
   "Postoji li pjesma koja te uvijek vrati na neko posebno sjećanje?",
   "Što je nešto što uvijek može popraviti tvoje raspoloženje?",
-  "Koji bi bio tvoj supermoć?",
-  "Što ti je zadalo największi izazov ove godine?",
+  "Koja bi bila tvoja supermoć?",
+  "Što ti je zadalo najveći izazov ove godine?",
   "Kako se nosiš s teškim danima?",
   "Što u sebi cijeniš najviše?",
   "Koji projekt ili hobi želiš početi?",
-  "Što za tebe znači savršen dan s mnom?",
+  "Što za tebe znači savršen dan sa mnom?",
 ];
 
 export const questionService = {
-  /** Returns today's question index (same for both partners). */
   getTodayIndex() {
     const daysSinceEpoch = Math.floor(Date.now() / 86400000);
     return daysSinceEpoch % QUESTIONS.length;
@@ -205,7 +178,6 @@ export const questionService = {
     return QUESTIONS[this.getTodayIndex()];
   },
 
-  /** Save or update a user's answer for today's question. */
   async saveAnswer(coupleId, uid, answer) {
     const today = new Date().toISOString().split("T")[0];
     const docId = `${coupleId}_${today}`;
@@ -228,14 +200,12 @@ export const questionService = {
     await coupleService.updateStreak(coupleId);
   },
 
-  /** Get today's answer doc for a couple. */
   async getTodayAnswers(coupleId) {
     const today = new Date().toISOString().split("T")[0];
     const snap = await getDoc(doc(db, "answers", `${coupleId}_${today}`));
     return snap.exists() ? snap.data() : null;
   },
 
-  /** Subscribe to today's answers. Returns unsubscribe fn. */
   subscribeTodayAnswers(coupleId, callback) {
     const today = new Date().toISOString().split("T")[0];
     return onSnapshot(doc(db, "answers", `${coupleId}_${today}`), (snap) => {
@@ -243,7 +213,6 @@ export const questionService = {
     });
   },
 
-  /** Get past N answer docs for a couple (for history). */
   async getAnswerHistory(coupleId, count = 10) {
     const q = query(
       collection(db, "answers"),
@@ -256,10 +225,7 @@ export const questionService = {
   },
 };
 
-// ─── chat / messages ─────────────────────────────────────────────────────────
-
 export const chatService = {
-  /** Send a message. */
   async sendMessage(coupleId, uid, text) {
     await addDoc(collection(db, "messages"), {
       coupleId,
@@ -270,7 +236,6 @@ export const chatService = {
     await coupleService.updateStreak(coupleId);
   },
 
-  /** Subscribe to last N messages in realtime. Returns unsubscribe fn. */
   subscribeMessages(coupleId, callback, count = 50) {
     const q = query(
       collection(db, "messages"),
@@ -284,8 +249,6 @@ export const chatService = {
   },
 };
 
-// ─── mood ────────────────────────────────────────────────────────────────────
-
 export const MOODS = [
   { emoji: "😊", label: "Sretno" },
   { emoji: "😌", label: "Mirno" },
@@ -298,7 +261,6 @@ export const MOODS = [
 ];
 
 export const moodService = {
-  /** Set current user's mood. */
   async setMood(uid, mood) {
     await updateDoc(doc(db, "users", uid), {
       mood,
@@ -307,10 +269,7 @@ export const moodService = {
   },
 };
 
-// ─── journal ─────────────────────────────────────────────────────────────────
-
 export const journalService = {
-  /** Add a new journal entry. imageUrl is optional. */
   async addEntry(coupleId, uid, { title, text, imageUrl = null }) {
     await addDoc(collection(db, "journal"), {
       coupleId,
@@ -323,12 +282,10 @@ export const journalService = {
     await coupleService.updateStreak(coupleId);
   },
 
-  /** Delete a journal entry (only if owner). */
   async deleteEntry(entryId) {
     await deleteDoc(doc(db, "journal", entryId));
   },
 
-  /** Subscribe to all journal entries for a couple. Returns unsubscribe fn. */
   subscribeEntries(coupleId, callback) {
     const q = query(
       collection(db, "journal"),
@@ -341,13 +298,7 @@ export const journalService = {
   },
 };
 
-// ─── activity calendar ───────────────────────────────────────────────────────
-
 export const activityService = {
-  /**
-   * Get all dates with activity for the current month.
-   * Returns a Set of date strings like "2025-06-14".
-   */
   async getActivedays(coupleId) {
     const now = new Date();
     const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1)

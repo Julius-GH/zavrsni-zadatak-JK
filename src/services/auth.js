@@ -10,7 +10,6 @@ import {
     sendEmailVerification
 } from "firebase/auth";
 
-// global state
 export const [currentUser, setCurrentUser] = createSignal(null);
 export const [isAuthenticated, setIsAuthenticated] = createSignal(false);
 export const [authLoading, setAuthLoading] = createSignal(true);
@@ -21,7 +20,7 @@ onAuthStateChanged(auth, (user) => {
     setAuthLoading(false);
 
     if (user) {
-        console.log("User OK", user);
+        console.log("User OK");
     } else {
         console.log("NO User");
     }
@@ -30,11 +29,9 @@ onAuthStateChanged(auth, (user) => {
 export const authService = {
     async signUp(email, password, name = "") {
         try {
-            // create user
             const userCred = await createUserWithEmailAndPassword(auth, email, password);
             const user = userCred.user;
 
-            // name update
             if (name.trim()) {
                 await updateProfile(user, {
                     displayName: name.trim()
@@ -42,7 +39,6 @@ export const authService = {
                 })
             }
 
-            // email verification
             await sendEmailVerification(user);
 
             console.log("User signed up", user.email);
@@ -119,16 +115,13 @@ export const authService = {
     },
     getErrorMessage(error) {
         const errorMessages = {
-            // Sign up errors
             "auth/email-already-in-use": "E-mail adresa je već u upotrebi",
             "auth/invalid-email": "E-mail adresa nije u ispravnom obliku",
             "auth/weak-password": "Zaporka je prejednostavna",
-            // Sign in errors
             "auth/user-not-found": "Korisnik ne postoji",
             "auth/wrong-password": "Zaporka nije točna",
             "auth/user-disabled": "Korisnički račun je blokiran",
             "auth/invalis-credential": "Pogrešni podaci za prijavu",
-            // General errors
             "auth/too-many-requests": "Previše neuspjelih pokušaja",
             "auth/network-request-failed": "Greška mreže",
             "auth/operation-not-allowed": "Operacija nije dopuštena, kontaktirajte administratora",

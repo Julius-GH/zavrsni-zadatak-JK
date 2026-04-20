@@ -12,7 +12,6 @@ export default function Connect() {
     const [loading, setLoading] = createSignal(false);
     const [userDoc, setUserDoc] = createSignal(null);
 
-    // Reactively load user doc when currentUser() becomes available
     createEffect(async () => {
         const u = currentUser();
         if (!u) return;
@@ -44,7 +43,6 @@ export default function Connect() {
     }
 
     function handleCodeInput(e) {
-        // auto-uppercase, max 6 chars
         const val = e.target.value.toUpperCase().replace(/[^A-Z0-9]/g, "").slice(0, 6);
         setCode(val);
     }
@@ -72,7 +70,6 @@ export default function Connect() {
                     </Show>
 
                     <Show when={!userDoc()?.coupleId}>
-                        {/* Header */}
                         <div class="text-center">
                             <div class="text-5xl mb-3">💑</div>
                             <h1 class="text-2xl font-bold">Poveži se s partnerom</h1>
@@ -81,7 +78,6 @@ export default function Connect() {
                             </p>
                         </div>
 
-                        {/* Your code */}
                         <div class="bg-base-200 rounded-2xl p-4 text-center">
                             <p class="text-sm text-base-content/60 mb-2">Tvoj kod za spajanje</p>
                             <Show
@@ -108,7 +104,6 @@ export default function Connect() {
 
                         <div class="divider text-xs text-base-content/40">ILI UNESI PARTNEROV KOD</div>
 
-                        {/* Enter partner code */}
                         <form onSubmit={handleConnect} class="flex flex-col gap-4">
                             <div class="form-control">
                                 <label class="label">

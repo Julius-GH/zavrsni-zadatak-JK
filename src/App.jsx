@@ -6,7 +6,6 @@ import { Show, createSignal, onMount, onCleanup } from "solid-js";
 import Toast from "./components/Toast.jsx";
 import { userService } from "./services/db.js";
 
-// pages
 import Home from "./pages/Home";
 import SignIn from "./pages/SignIn";
 import SignUp from "./pages/SignUp";
@@ -15,11 +14,10 @@ import SignOut from "./pages/SignOut";
 import ResetPassword from "./pages/ResetPassword";
 import UserProfile from "./pages/UserProfile.jsx";
 import Connect from "./pages/Connect.jsx";
+import Question from "./pages/Question.jsx";
+import Chat from "./pages/Chat.jsx";
+import Journal from "./pages/Journal.jsx";
 
-// (future pages — uncomment as you build them)
-// import Question from "./pages/Question.jsx";
-// import Chat from "./pages/Chat.jsx";
-// import Journal from "./pages/Journal.jsx";
 // import Calendar from "./pages/Calendar.jsx";
 
 export default function App() {
@@ -36,11 +34,9 @@ export default function App() {
         </Route>
       </Route>
 
-      {/* Protected app routes */}
       <Route path="/connect" component={AuthBoundary}>
         <Route path="/" component={Connect} />
       </Route>
-      {/* Uncomment as you build each page:
       <Route path="/question" component={AuthBoundary}>
         <Route path="/" component={Question} />
       </Route>
@@ -50,10 +46,10 @@ export default function App() {
       <Route path="/journal" component={AuthBoundary}>
         <Route path="/" component={Journal} />
       </Route>
-      <Route path="/calendar" component={AuthBoundary}>
+
+      {/* <Route path="/calendar" component={AuthBoundary}>
         <Route path="/" component={Calendar} />
-      </Route>
-      */}
+      </Route> */}
 
       <Route path="/error" component={Error} />
       <Route path="*" component={NotFound} />
@@ -62,7 +58,6 @@ export default function App() {
 }
 
 function Layout(props) {
-  // Track if current user has a partner, to show correct nav links
   const [hasCoupleId, setHasCoupleId] = createSignal(false);
 
   let unsub;
@@ -88,10 +83,9 @@ function Layout(props) {
             <ul tabindex="-1" class="menu menu-sm dropdown-content bg-base-100 rounded-box z-1 mt-3 w-52 p-2 shadow">
               <Show when={isAuthenticated() && hasCoupleId()}>
                 <li><a href="/">🏠 Početna</a></li>
-                {/* Uncomment as pages are built: */}
-                {/* <li><a href="/question">💬 Pitanje dana</a></li> */}
-                {/* <li><a href="/chat">✉️ Chat</a></li> */}
-                {/* <li><a href="/journal">📖 Dnevnik</a></li> */}
+                <li><a href="/question">💬 Pitanje dana</a></li>
+                <li><a href="/chat">✉️ Chat</a></li>
+                <li><a href="/journal">📖 Dnevnik</a></li>
                 {/* <li><a href="/calendar">📅 Kalendar</a></li> */}
               </Show>
               <Show when={isAuthenticated() && !hasCoupleId()}>
@@ -118,6 +112,7 @@ function Layout(props) {
             <Show when={!hasCoupleId()}>
               <a href="/connect" class="btn btn-ghost btn-square text-2xl" title="Poveži partnera">💑</a>
             </Show>
+            <a href="/chat" class="btn btn-ghost btn-square text-2xl" title="Chat">✉️</a>
             <a href="/user/profile" class="btn btn-ghost btn-square text-2xl" title="Profil">👤</a>
             <a href="/user/signout" class="btn btn-ghost btn-square text-2xl" title="Odjava">🚷</a>
           </Show>
