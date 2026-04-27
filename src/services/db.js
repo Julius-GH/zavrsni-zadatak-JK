@@ -299,14 +299,11 @@ export const journalService = {
 };
 
 export const activityService = {
-  async getActivedays(coupleId) {
-    const now = new Date();
-    const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1)
-      .toISOString()
-      .split("T")[0];
-    const endOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0)
-      .toISOString()
-      .split("T")[0];
+  async getActiveDaysForMonth(coupleId, date) {
+    const year = date.getFullYear();
+    const month = date.getMonth();
+    const startOfMonth = new Date(year, month, 1).toISOString().split("T")[0];
+    const endOfMonth = new Date(year, month + 1, 0).toISOString().split("T")[0];
 
     const q = query(
       collection(db, "answers"),
@@ -315,6 +312,6 @@ export const activityService = {
       where("date", "<=", endOfMonth)
     );
     const snap = await getDocs(q);
-    return new Set(snap.docs.map((d) => d.data().date));
+    return new Set(snap.docs.map((d) => d.data().date)); 
   },
 };

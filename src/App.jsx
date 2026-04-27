@@ -2,7 +2,7 @@ document.documentElement.setAttribute("data-theme", "love");
 
 import { Router, Route, Navigate } from "@solidjs/router";
 import { isAuthenticated, authLoading, currentUser } from "./services/auth.js";
-import { Show, createSignal, onMount, onCleanup } from "solid-js";
+import { Show, createSignal, createEffect, onCleanup } from "solid-js";
 import Toast from "./components/Toast.jsx";
 import { userService } from "./services/db.js";
 
@@ -17,8 +17,7 @@ import Connect from "./pages/Connect.jsx";
 import Question from "./pages/Question.jsx";
 import Chat from "./pages/Chat.jsx";
 import Journal from "./pages/Journal.jsx";
-
-// import Calendar from "./pages/Calendar.jsx";
+import Calendar from "./pages/Calendar.jsx";
 
 export default function App() {
   return (
@@ -46,10 +45,9 @@ export default function App() {
       <Route path="/journal" component={AuthBoundary}>
         <Route path="/" component={Journal} />
       </Route>
-
-      {/* <Route path="/calendar" component={AuthBoundary}>
+      <Route path="/calendar" component={AuthBoundary}>
         <Route path="/" component={Calendar} />
-      </Route> */}
+      </Route>
 
       <Route path="/error" component={Error} />
       <Route path="*" component={NotFound} />
@@ -61,9 +59,10 @@ function Layout(props) {
   const [hasCoupleId, setHasCoupleId] = createSignal(false);
 
   let unsub;
-  onMount(() => {
+  createEffect(() => {
     const u = currentUser();
     if (!u) return;
+    if (unsub) return;
     unsub = userService.subscribeUser(u.uid, (data) => {
       setHasCoupleId(!!data?.coupleId);
     });
@@ -86,7 +85,7 @@ function Layout(props) {
                 <li><a href="/question">💬 Pitanje dana</a></li>
                 <li><a href="/chat">✉️ Chat</a></li>
                 <li><a href="/journal">📖 Dnevnik</a></li>
-                {/* <li><a href="/calendar">📅 Kalendar</a></li> */}
+                <li><a href="/calendar">📅 Kalendar</a></li>
               </Show>
               <Show when={isAuthenticated() && !hasCoupleId()}>
                 <li><a href="/connect">💑 Poveži se s partnerom</a></li>
