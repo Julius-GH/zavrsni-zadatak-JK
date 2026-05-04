@@ -45,7 +45,6 @@ export default function Calendar() {
     return date.toLocaleDateString("hr-HR", { month: "long", year: "numeric" });
   }
 
-  // Build a 2D grid of weeks for the current month
   function buildCalendarGrid(date) {
     const year = date.getFullYear();
     const month = date.getMonth();
@@ -53,22 +52,17 @@ export default function Calendar() {
     const firstDay = new Date(year, month, 1);
     const lastDay = new Date(year, month + 1, 0);
 
-    // Monday-based week (0=Mon ... 6=Sun)
-    let startDow = firstDay.getDay(); // 0=Sun
-    startDow = startDow === 0 ? 6 : startDow - 1; // convert to Mon-based
+    let startDow = firstDay.getDay();
+    startDow = startDow === 0 ? 6 : startDow - 1;
 
     const days = [];
 
-    // leading empty cells
     for (let i = 0; i < startDow; i++) days.push(null);
 
-    // actual days
     for (let d = 1; d <= lastDay.getDate(); d++) days.push(d);
 
-    // trailing empty cells to complete last row
     while (days.length % 7 !== 0) days.push(null);
 
-    // split into weeks
     const weeks = [];
     for (let i = 0; i < days.length; i += 7) {
       weeks.push(days.slice(i, i + 7));
@@ -109,7 +103,6 @@ export default function Calendar() {
 
   const DAY_LABELS = ["Pon", "Uto", "Sri", "Čet", "Pet", "Sub", "Ned"];
 
-  // Stats for current month
   const activeCount = () => activeDays().size;
   const daysInMonth = () => new Date(
     currentDate().getFullYear(),
@@ -129,7 +122,6 @@ export default function Calendar() {
   return (
     <div class="max-w-lg mx-auto p-4 flex flex-col gap-6">
 
-      {/* Header */}
       <div>
         <h1 class="text-2xl font-bold">Kalendar aktivnosti 📅</h1>
         <p class="text-base-content/50 text-sm mt-0.5">
@@ -137,7 +129,6 @@ export default function Calendar() {
         </p>
       </div>
 
-      {/* Month navigator */}
       <div class="flex items-center justify-between">
         <button
           class="btn btn-ghost btn-sm btn-square"
@@ -158,7 +149,6 @@ export default function Calendar() {
         </button>
       </div>
 
-      {/* Calendar grid */}
       <div class="card bg-base-100 shadow-sm">
         <div class="card-body p-4">
 
@@ -169,7 +159,6 @@ export default function Calendar() {
           </Show>
 
           <Show when={!loading()}>
-            {/* Day labels */}
             <div class="grid grid-cols-7 mb-1">
               <For each={DAY_LABELS}>
                 {(label) => (
@@ -180,7 +169,6 @@ export default function Calendar() {
               </For>
             </div>
 
-            {/* Weeks */}
             <For each={buildCalendarGrid(currentDate())}>
               {(week) => (
                 <div class="grid grid-cols-7 gap-1 mb-1">
@@ -211,7 +199,6 @@ export default function Calendar() {
               )}
             </For>
 
-            {/* Legend */}
             <div class="flex items-center gap-4 mt-3 pt-3 border-t border-base-200">
               <div class="flex items-center gap-1.5">
                 <div class="w-3 h-3 rounded-full bg-primary" />
@@ -226,7 +213,6 @@ export default function Calendar() {
         </div>
       </div>
 
-      {/* Stats */}
       <Show when={!loading()}>
         <div class="grid grid-cols-3 gap-3">
           <div class="card bg-base-100 shadow-sm">
